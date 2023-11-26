@@ -1,0 +1,21 @@
+.container {
+    display: flex;
+    flex-direction: column;
+
+    .item {
+        height: fit-content;
+        min-height: 20px;
+        padding: 5px 0;
+        display: flex;
+        cursor: pointer;
+        color: @primary-color;
+        :global {
+            .anticon {
+                &:hover {
+                    // color: @primary-color;
+                }
+                padding: 0 10px;
+            }
+        }
+    }
+}
