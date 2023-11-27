@@ -62,6 +62,7 @@ module.exports = {
         use: [
           // 开启多线程
           // 使用时,需将此 loader 放置在其他 loader 之前。放置在此 loader 之后的 loader 会在一个独立的 worker 池中运行。
+          //  thread-loader 引入后，需要 0.6s 左右的时间开启新的 node 进程 ,应该仅在非常耗时的 loader 前引入 thread-loader
           "thread-loader",
           {
             loader: "babel-loader",
