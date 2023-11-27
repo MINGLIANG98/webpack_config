@@ -8,12 +8,14 @@
 // webpack.prod.js
 const path = require('path')
 const { merge } = require('webpack-merge')
+const globAll = require('glob-all')
 const baseConfig = require('./webpack.base.js')
 const CopyPlugin = require('copy-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const CssMinimizerPlugin = require('css-minimizer-webpack-plugin')
 const TerserPlugin = require('terser-webpack-plugin')
-
+const PurgeCSSPlugin = require('purgecss-webpack-plugin')
+const CompressionPlugin  = require('compression-webpack-plugin')
 module.exports = merge(baseConfig, {
     mode: 'production', // 生产模式,会开启tree-shaking和压缩代码,以及其他优化
     plugins: [
@@ -34,6 +36,31 @@ module.exports = merge(baseConfig, {
         new MiniCssExtractPlugin({
             filename: 'static/css/[name].[contenthash:8].css' // 抽离css的输出目录和名称
         }),
+        // 清理无用css
+        new PurgeCSSPlugin({
+            // 检测src下所有tsx文件和public下index.html中使用的类名和id和标签名称
+            // 只打包这些文件中用到的样式
+            paths: globAll.sync([
+                `${path.join(__dirname, '../src')}/**/*.tsx`,
+                path.join(__dirname, '../public/index.html')
+            ]),
+            // 白名单
+            safelist: {
+                standard: [/^ant-/], // 过滤以ant-开头的类名，哪怕没用到也不删除
+            }
+        }),
+        /**
+         * 优先级大于nginx gzip压缩配置
+         * Nginx 会检查请求的文件是否已经被压缩。如果请求的文件已经是压缩格式（如 .gz 文件），而且浏览器发送了相应的头信息（Accept-Encoding: gzip 等），Nginx 就不会再对这个文件进行压缩
+         * **/
+        new CompressionPlugin({
+            test: /.(js|css)$/, // 只生成css,js压缩文件
+            filename: '[path][base].gz', // 文件命名
+            algorithm: 'gzip', // 压缩格式,默认是gzip
+            test: /.(js|css)$/, // 只生成css,js压缩文件
+            threshold: 10240, // 只有大小大于该值的资源会被处理。默认值是 10k
+            minRatio: 0.8 // 压缩率,默认值是 0.8  //nginx配置的默认压缩率是0.7
+        })
     ],
     optimization: {
         minimizer: [
@@ -75,7 +102,6 @@ module.exports = merge(baseConfig, {
                 }
             }
             // memo:，将来自node_modules目录下的模块打包成一个文件（vendors.js），将页面中被使用两次(minChunks)以上的公共模块打包成一个文件（commons.js）。
-
         }
     },
 })

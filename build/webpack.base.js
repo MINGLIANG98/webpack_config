@@ -15,9 +15,7 @@ const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const webpack = require("webpack");
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
-
-console.log("NODE_ENV", process.env.NODE_ENV);
-console.log("BASE_ENV", process.env.BASE_ENV);
+const WebpackBar = require('webpackbar');
 const isDev = process.env.NODE_ENV === "development"; // 是否是开发模式
 
 // 链接：https://juejin.cn/post/7111922283681153038
@@ -189,5 +187,11 @@ module.exports = {
       // 配置后会把值注入到业务代码里面去
       "process.env.BASE_ENV": JSON.stringify(process.env.BASE_ENV),
     }),
+    // 进度条
+    new WebpackBar({
+      // color: "#85d",  // 默认green，进度条颜色支持HEX
+      basic: false,   // 默认true，启用一个简单的日志报告器
+      profile:false,  // 默认false，启用探查器。
+    })
   ],
 };
