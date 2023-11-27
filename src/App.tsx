@@ -12,6 +12,7 @@ import smallImg from "@/assets/5kb.png";
 import bigImg from "@/assets/22kb.png";
 import Demo1 from "./components/Demo1";
 import Demo2 from "./components/Demo2";
+import Table from './components/table'
 // 魔法注释
 // import(
 //   /* webpackChunkName: "my-chunk-name" */ // 资源打包后的文件chunkname
@@ -67,6 +68,7 @@ function App() {
       <Demo1 />
       <div className="smallImg"></div>
       <div className="bigImg"></div>
+      <Table />
       <h2 onClick={onClick}>展示</h2>
       {/* show为true时加载组件 */}
       {show && (
