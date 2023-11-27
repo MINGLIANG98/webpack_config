@@ -17,7 +17,13 @@ const TerserPlugin = require('terser-webpack-plugin')
 const PurgeCSSPlugin = require('purgecss-webpack-plugin')
 const CompressionPlugin  = require('compression-webpack-plugin')
 module.exports = merge(baseConfig, {
-    mode: 'production', // 生产模式,会开启tree-shaking和压缩代码,以及其他优化
+    mode: 'production', // 生产模式,会开启tree-shaking和压缩代码,以及其他优化   Tree Shaking 主要依赖于 ES6 模块的静态特性
+    /**
+     * antd是由es模块语法编写的所以可以支持默认treeshaking
+     * lodash为了良好的浏览器兼容性, 它使用了旧版es5的模块语法; 而lodash-es则使用了es6的模块语法, 这让webpack之类的打包工具可以对其进行tree shake以删除为使用的代码来优化打包尺寸.
+     * 对于lodash这种es5模块语法的插件  可以替换为它的es6模块版本 或者使用 babel-plugin-import来进行处理
+     * https://juejin.cn/post/6926850164015497229
+     **/ 
     plugins: [
         // 复制文件插件  
         new CopyPlugin({

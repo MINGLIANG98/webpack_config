@@ -51,7 +51,7 @@ function App() {
   };
   useEffect(() => {
     console.log(count);
-    // console.log('update');
+    console.log('update');
 
     return () => {};
   }, [count]);
