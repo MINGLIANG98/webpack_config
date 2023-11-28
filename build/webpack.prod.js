@@ -15,7 +15,7 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const CssMinimizerPlugin = require('css-minimizer-webpack-plugin')
 const TerserPlugin = require('terser-webpack-plugin')
 const PurgeCSSPlugin = require('purgecss-webpack-plugin')
-const CompressionPlugin  = require('compression-webpack-plugin')
+const CompressionPlugin = require('compression-webpack-plugin')
 module.exports = merge(baseConfig, {
     mode: 'production', // 生产模式,会开启tree-shaking和压缩代码,以及其他优化   Tree Shaking 主要依赖于 ES6 模块的静态特性
     /**
@@ -23,7 +23,7 @@ module.exports = merge(baseConfig, {
      * lodash为了良好的浏览器兼容性, 它使用了旧版es5的模块语法; 而lodash-es则使用了es6的模块语法, 这让webpack之类的打包工具可以对其进行tree shake以删除为使用的代码来优化打包尺寸.
      * 对于lodash这种es5模块语法的插件  可以替换为它的es6模块版本 或者使用 babel-plugin-import来进行处理
      * https://juejin.cn/post/6926850164015497229
-     **/ 
+     **/
     plugins: [
         // 复制文件插件  
         new CopyPlugin({
@@ -92,9 +92,33 @@ module.exports = merge(baseConfig, {
         // splitChunks 的主要作用是将公共的代码部分拆分成单独的文件，以便更好地利用浏览器的缓存机制，提高应用的加载性能。
         splitChunks: { // 分隔代码
             cacheGroups: {
+                /**
+                 * 缓存组
+                 * key不重复即可
+                 * {
+                 * test: 用于指定匹配的模块路径的正则表达式。符合条件的模块会被纳入到当前的缓存组中。
+                 * name: 定义拆分出的包的名称。可以使用 [name]、[id]、[chunkhash] 等占位符。
+                 * priority: 用于指定缓存组的优先级。优先级高的缓存组会优先匹配模块。
+                 * chunks: 定义哪些类型的代码块可以被拆分，可以是 'initial'、'async'、'all' 等。
+                 * minSize: 定义生成的代码块的最小大小，小于该大小的模块不会被拆分。
+                 * minChunks: 定义被拆分的模块至少要在多少个 chunk 中被引用才会被拆分。
+                 * maxAsyncRequests: 定义按需加载时的最大并行请求数。
+                 * maxInitialRequests: 定义入口点的最大并行请求数。
+                 * reuseExistingChunk: 如果当前的 chunk 包含的模块已经被拆分出去了，是否复用已有的 chunk。
+                 * enforce: 定义缓存组的行为是否强制执行。如果为 true，则无论是否满足条件都会创建一个新的 chunk。
+                 * }
+                 */
                 vendors: { // 提取node_modules代码
                     test: /node_modules/, // 只匹配node_modules里面的模块
                     name: 'vendors', // 提取文件命名为vendors,js后缀和chunkhash会自动加 通过output
+                    // name(module) {
+                    //     // get the name. E.g. node_modules/packageName/not/this/part.js
+                    //     // or node_modules/packageName
+                    //     const packageName = module.context.match(/[\\/]node_modules[\\/](.*?)([\\/]|$)/)[1];
+
+                    //     // npm package names are URL-safe, but some servers don't like @ symbols
+                    //     return `npm.${packageName.replace('@', '')}`;
+                    // },
                     minChunks: 1, // 只要使用一次就提取出来
                     chunks: 'initial', // 只提取初始化就能获取到的模块,不管异步的
                     minSize: 0, // 提取代码体积大于0就提取出来
