@@ -60,7 +60,6 @@ const getRandomuserParams = (params: TableParams) => ({
   page: params.pagination?.current,
   ...params,
 });
-console.log(sum);
 
 const App: React.FC = () => {
   const [data, setData] = useState<DataType[]>();

@@ -49,7 +49,7 @@ module.exports = {
   },
   module: {
     // rules
-    //  倒叙执行rules数组 
+    // 倒叙执行rules数组 
     // 会根据文件后缀来倒序遍历rules数组，如果文件后缀和test正则匹配到了，就会使用该rule中配置的loader依次对文件源代码进行处理，最终拿到处理后的sourceCode结果
     rules: [
       // include：只解析该选项配置的模块
@@ -94,11 +94,52 @@ module.exports = {
           },
         ],
       },
-      // 解析 jsx js
-      // 如果node_moduels中也有要处理的语法，可以把js|jsx文件配置加上
+      // 解析 jsx 
       {
-        test: /.(js|jsx)$/,
-        use: ["babel-loader"],
+        test: /\.jsx$/,
+        include: [path.resolve(__dirname, '../src')],
+        use: [
+          "thread-loader",
+          {
+            loader: "babel-loader",
+            options: {
+              presets: [
+                [
+                  "@babel/preset-env",
+                  {
+                    useBuiltIns: "usage", // 根据配置的浏览器兼容,以及代码中使用到的api进行引入polyfill按需添加
+                    corejs: 3, // 配置使用core-js低版本
+                  },
+                ],
+                "@babel/preset-react",
+              ],
+              plugins: [
+                isDev && require.resolve("react-refresh/babel"),
+              ].filter(Boolean), //过滤空值
+            },
+          },
+        ],
+      },
+      // 解析 js
+      {
+        test: /\.js$/,
+        include: [path.resolve(__dirname, '../src')],
+        use: [
+          {
+            loader: "babel-loader",
+            options: {
+              presets: [
+                [
+                  "@babel/preset-env",
+                  {
+                    useBuiltIns: "usage", // 根据配置的浏览器兼容,以及代码中使用到的api进行引入polyfill按需添加
+                    corejs: 3, // 配置使用core-js低版本
+                  },
+                ],
+              ],
+            },
+          },
+        ],
       },
       // 解析 css
       {
@@ -192,7 +233,7 @@ module.exports = {
     new WebpackBar({
       // color: "#85d",  // 默认green，进度条颜色支持HEX
       basic: false,   // 默认true，启用一个简单的日志报告器
-      profile:false,  // 默认false，启用探查器。
+      profile: false,  // 默认false，启用探查器。
     })
   ],
 };
